@@ -32,7 +32,7 @@ They can be found at:
 2. Follow instructions, move on to following exercises once tests all pass.
 3. Solutions can be found [here](./data-ingestion/Data%20Ingestion%20CO2%20vs%20Temperature%20Solutions.dbc).
 
-## Data Ingestion
+## Data Transformation
 1. Open [Data Transformation CO2 vs Temperature.dbc](./data-transformation/Data%20Transformation%20CO2%20vs%20Temperature.dbc) in [Databricks Community Edition](https://community.cloud.databricks.com/)
    ![databricks-import](databricks-import.png)
 2. Follow instructions, move on to following exercises once tests all pass.
