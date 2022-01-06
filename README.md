@@ -1,6 +1,10 @@
 # CO2 vs. Temperature Exercise
 This repository contains an exercise that ingests Global Temperature and Global Temperature By Country data from Kaggle and CO2 Emissions data from OWID. The goal of this exercise is to teach some basics about data wrangling and Spark with respect to real world questions.
 
+* Which countries are worse-hit (higher temperature anomalies)?
+* Which countries are the biggest emitters?
+* What are some attempts of ranking “biggest polluters” in a sensible way?
+
 ## Data Sources
 In order to answer some of the questions of the exercise, we picked open-source data from [Open World in Data (OWID)](https://github.com/owid/owid-datasets/tree/0f47d280d298694c50b82db98daa94cd6e867d2e/datasets/CO2%20emissions%20(Aggregate%20dataset%20(2020))) and [Kaggle](https://www.kaggle.com/berkeleyearth/climate-change-earth-surface-temperature-data).
 
