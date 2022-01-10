@@ -1,4 +1,4 @@
-# CO2 vs. Temperature Exercise
+# CO2 vs. Temperature Exercise (Databricks)
 This repository contains exercises in Databricks that ingests Global Temperature and Global Temperature By Country data from Kaggle and CO2 Emissions data from OWID and transforms it. The goal of this exercise is to teach some basics about data wrangling and Spark with respect to real world questions.
 
 * Which countries are worse-hit (higher temperature anomalies)?
