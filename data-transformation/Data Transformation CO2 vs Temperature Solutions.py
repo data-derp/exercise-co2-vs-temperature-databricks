@@ -60,8 +60,11 @@
 # COMMAND ----------
 
 # Set URLS of input parquet data
+
 CO2_URL = "https://raw.githubusercontent.com/data-derp/exercise-co2-vs-temperature/master/data-transformation/input-data/EmissionsByCountry.parquet/part-00000-a5120099-3f2e-437a-98c6-feb2845cdf28-c000.snappy.parquet"
+
 GLOBAL_TEMPERATURES_URL = "https://raw.githubusercontent.com/data-derp/exercise-co2-vs-temperature/master/data-transformation/input-data/GlobalTemperatures.parquet/part-00000-f77d0e73-78da-48a2-be74-681dd35a82cf-c000.snappy.parquet"
+
 TEMPERATURES_BY_COUNTRY_URL = "https://raw.githubusercontent.com/data-derp/exercise-co2-vs-temperature/master/data-transformation/input-data/TemperaturesByCountry.parquet/part-00000-b9e4293b-b7a5-4582-86d1-eccf44649b40-c000.snappy.parquet"
 
 # COMMAND ----------
@@ -76,6 +79,9 @@ TEMPERATURES_BY_COUNTRY_URL = "https://raw.githubusercontent.com/data-derp/exerc
 # Download files to the local filesystem
 import os
 import wget
+import sys
+ 
+sys.stdout.fileno = lambda: False # prevents AttributeError: 'ConsoleBuffer' object has no attribute 'fileno'   
 
 URLS = [CO2_URL, GLOBAL_TEMPERATURES_URL, TEMPERATURES_BY_COUNTRY_URL]
 filenames = []
@@ -1289,7 +1295,6 @@ test_boss_battle_the_revenge()
 oceania_emissions_edited = boss_battle(country_emissions)
 display(oceania_emissions_edited)
 
-
 # COMMAND ----------
 
 oceania_emissions_edited.coalesce(1).orderBy("Year") \
@@ -1391,7 +1396,3 @@ def test_run():
   print("All tests passed :)")
   
 test_run()  
-
-# COMMAND ----------
-
-
