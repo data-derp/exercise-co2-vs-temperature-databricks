@@ -27,13 +27,15 @@ They can be found at:
 * [Databricks Community Edition (free) account](https://community.cloud.databricks.com/)
 
 ## Data Ingestion
-1. Open [Data Ingestion CO2 vs Temperature.dbc](./data-ingestion/Data%20Ingestion%20CO2%20vs%20Temperature.py) in [Databricks Community Edition](https://community.cloud.databricks.com/)
+1. Clone this repo if you haven't already done so
+2. Open [Data Ingestion CO2 vs Temperature.dbc](./data-ingestion/Data%20Ingestion%20CO2%20vs%20Temperature.py) in [Databricks Community Edition](https://community.cloud.databricks.com/)
 ![databricks-import](databricks-import.png)
-2. Follow instructions, move on to following exercises once tests all pass.
-3. Solutions can be found [here](./data-ingestion/Data%20Ingestion%20CO2%20vs%20Temperature%20Solutions.py).
+3. Follow instructions, move on to following exercises once tests all pass.
+4. Solutions can be found [here](./data-ingestion/Data%20Ingestion%20CO2%20vs%20Temperature%20Solutions.py).
 
 ## Data Transformation
-1. Open [Data Transformation CO2 vs Temperature.dbc](./data-transformation/Data%20Transformation%20CO2%20vs%20Temperature.py) in [Databricks Community Edition](https://community.cloud.databricks.com/)
+1. Clone this repo if you haven't already done so
+2. Open [Data Transformation CO2 vs Temperature.dbc](./data-transformation/Data%20Transformation%20CO2%20vs%20Temperature.py) in [Databricks Community Edition](https://community.cloud.databricks.com/)
    ![databricks-import](databricks-import.png)
-2. Follow instructions, move on to following exercises once tests all pass.
-3. Solutions can be found [here](./data-transformation/Data%20Transformation%20CO2%20vs%20Temperature%20Solutions.py).
+3. Follow instructions, move on to following exercises once tests all pass.
+4. Solutions can be found [here](./data-transformation/Data%20Transformation%20CO2%20vs%20Temperature%20Solutions.py).
