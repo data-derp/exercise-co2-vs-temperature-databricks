@@ -24,7 +24,7 @@ They can be found at:
 ## Prerequisites
 * Basic knowledge of Python
 * Basic knowledge of Spark
-* [Databricks Community Edition (free) account](https://community.cloud.databricks.com/)
+* [Databricks Community Edition (free) account](#create-a-databricks-community-account)
 
 ## Create a Databricks Community Account
 1. Navigate the [Databricks Community Login Page](https://community.cloud.databricks.com/)
@@ -36,7 +36,7 @@ They can be found at:
 
    <img src="databricks-get-started.png" alt="databricks-get-started.png" width="200"/>
 
-4. SCROLL TO THE BOTTOM to create a Community Account
+4. **SCROLL TO THE BOTTOM** to create a Community Account
 
    <img src="databricks-create-account.png" alt="databricks-create-account.png" width="200"/>
 
