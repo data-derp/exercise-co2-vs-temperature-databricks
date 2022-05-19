@@ -29,11 +29,15 @@ They can be found at:
 ## Create a Databricks Community Account
 1. Navigate the [Databricks Community Login Page](https://community.cloud.databricks.com/)
 2. Click Signup
-   <img src="databricks-signup.png" alt="databricks-signup.png" width="200"/>
+
+<img src="databricks-signup.png" alt="databricks-signup.png" width="200"/>
+
 3. Fill in your details, click "Get Started For Free"
+
    <img src="databricks-get-started.png" alt="databricks-get-started.png" width="200"/>
 
 4. SCROLL TO THE BOTTOM to create a Community Account
+
    <img src="databricks-create-account.png" alt="databricks-create-account.png" width="200"/>
 
 
