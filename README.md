@@ -26,6 +26,17 @@ They can be found at:
 * Basic knowledge of Spark
 * [Databricks Community Edition (free) account](https://community.cloud.databricks.com/)
 
+## Create a Databricks Community Account
+1. Navigate the [Databricks Community Login Page](https://community.cloud.databricks.com/)
+2. Click Signup
+   <img src="databricks-signup.png" alt="databricks-signup.png" width="200"/>
+3. Fill in your details, click "Get Started For Free"
+   <img src="databricks-get-started.png" alt="databricks-get-started.png" width="200"/>
+
+4. SCROLL TO THE BOTTOM to create a Community Account
+   <img src="databricks-create-account.png" alt="databricks-create-account.png" width="200"/>
+
+
 ## Data Ingestion
 1. Clone this repo if you haven't already done so
 2. Open [Data Ingestion CO2 vs Temperature.py](./data-ingestion/Data%20Ingestion%20CO2%20vs%20Temperature.py) in [Databricks Community Edition](https://community.cloud.databricks.com/)
