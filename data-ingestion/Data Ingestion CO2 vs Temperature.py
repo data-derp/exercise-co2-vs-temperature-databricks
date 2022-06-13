@@ -80,6 +80,8 @@ TEMPERATURES_BY_COUNTRY_URL = "https://raw.githubusercontent.com/data-derp/exerc
 # Download files to the local filesystem
 import os
 import wget
+import sys
+sys.stdout.fileno = lambda: False # prevents AttributeError: 'ConsoleBuffer' object has no attribute 'fileno'   
 
 URLS = [CO2_URL, GLOBAL_TEMPERATURES_URL, TEMPERATURES_BY_COUNTRY_URL]
 filenames = []
