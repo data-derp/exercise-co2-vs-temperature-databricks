@@ -587,7 +587,7 @@ def fix_country(col: Column) -> Column:
 
 # COMMAND ----------
 
-def test_fix_country(self):
+def test_fix_country():
   original = pd.Series(["  gErMaNy ", "   uNiTeD sTaTeS    "])
   spark_df = self.spark.createDataFrame(pd.DataFrame({"Country": original}))
   spark_df = spark_df.withColumn("Country", self.transformer.fix_country(F.col("Country")))
@@ -598,6 +598,8 @@ def test_fix_country(self):
   except Exception as e:
     raise type(e)(''.join(debug(original))) from e
   print("All tests pass! :)")
+  
+test_fix_country()
 
 # COMMAND ----------
 
