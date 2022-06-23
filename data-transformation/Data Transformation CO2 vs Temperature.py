@@ -589,7 +589,7 @@ def fix_country(col: Column) -> Column:
 
 def test_fix_country():
   original = pd.Series(["  gErMaNy ", "   uNiTeD sTaTeS    "])
-  spark_df = self.spark.createDataFrame(pd.DataFrame({"Country": original}))
+  spark_df = spark.createDataFrame(pd.DataFrame({"Country": original}))
   spark_df = spark_df.withColumn("Country", self.transformer.fix_country(F.col("Country")))
   fixed = spark_df.toPandas()
   try:
