@@ -73,7 +73,7 @@ TEMPERATURES_BY_COUNTRY_URL = "https://raw.githubusercontent.com/data-derp/exerc
 Clear out existing working directory
 '''
 current_user=dbutils.notebook.entry_point.getDbutils().notebook().getContext().userName().get().split("@")[0]
-working_directory=f"/tmp/{current_user}/dataTransformation"
+working_directory=f"/FileStore/{current_user}/dataTransformation"
 dbutils.fs.rm(working_directory, True)
 
 # COMMAND ----------
@@ -82,34 +82,34 @@ dbutils.fs.rm(working_directory, True)
 import os
 import wget
 import sys
+import shutil
+
  
 sys.stdout.fileno = lambda: False # prevents AttributeError: 'ConsoleBuffer' object has no attribute 'fileno'   
 
+LOCAL_DIR = f"{os.getcwd()}/{current_user}/dataTransformation"
+
+shutil.rmtree(LOCAL_DIR)
+os.makedirs(LOCAL_DIR)
 URLS = [CO2_URL, GLOBAL_TEMPERATURES_URL, TEMPERATURES_BY_COUNTRY_URL]
 filenames = []
 
 for url in URLS:
-  saved_filename = wget.download(url, url.split("/")[-2].replace(".parquet", ".snappy.parquet"))
-  filenames.append(saved_filename)
-
-LOCAL_DIR = os.getcwd()
-print("LOCAL_DIR:", LOCAL_DIR)
-print("filenames:", filenames)
+  filename = url.split("/")[-2]
+  filenames.append(filename)
+  saved_filename = wget.download(url, out = f"{LOCAL_DIR}/{filename}")
+  print(f"Saved in: {saved_filename}")
 
 # COMMAND ----------
 
 # Set up a DBFS directory to keep a copy of our data in a distributed filesystem (rather than local/single-node)
-# Copy over the files from the local filesystem to our new DBFS directory (mini-project)
+# Copy over the files from the local filesystem to our new DBFS directory
 # (so that Spark can read in a performant manner from dbfs:/)
 
-EXERCISE_DIR = f"dbfs:/FileStore/{current_user}/data-transformation/"
-dbutils.fs.rm(EXERCISE_DIR, True) # delete directory, start fresh
-dbutils.fs.mkdirs(EXERCISE_DIR)
-
 for filename in filenames: # copy from local file system into a distributed file system such as DBFS
-  dbutils.fs.cp(f"file:{LOCAL_DIR}/{filename}", f"""{EXERCISE_DIR}{filename.replace(".snappy.parquet", ".parquet")}/{filename}""")
+  dbutils.fs.cp(f"file:{LOCAL_DIR}/{filename}", f"""{working_directory}/{filename}""")
   
-DBFS_FILEPATHS = [x.path for x in dbutils.fs.ls(EXERCISE_DIR)]
+DBFS_FILEPATHS = [x.path for x in dbutils.fs.ls(working_directory)]
 print(DBFS_FILEPATHS)
 CO2_PATH, GLOBAL_TEMPERATURES_PATH, TEMPERATURES_BY_COUNTRY_PATH = DBFS_FILEPATHS
 
