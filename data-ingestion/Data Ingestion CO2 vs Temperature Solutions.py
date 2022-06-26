@@ -43,7 +43,7 @@
 
 # MAGIC %md
 # MAGIC ## EXERCISE: Download data from an online repository into a Spark DataFrame  
-# MAGIC - The data for our mini-project is accessible at GitHub via the URLs in the cell above.
+# MAGIC - The data for our project is accessible at GitHub via the URLs in the cell above.
 # MAGIC - However, Spark (at the time of writing) does not support reading data directly from arbitrary http(s) addresses.
 # MAGIC - In practice, **you would not want to do this with big data anyways**.  
 # MAGIC   It's much better to load big data into a data lake (e.g. S3, Azure Data Lake Storage Gen2, or Azure Blob Storage).  
@@ -63,10 +63,12 @@
 
 # COMMAND ----------
 
-# MAGIC %sh
-# MAGIC # clear out all CSV files in local filesystem
-# MAGIC rm -rf *Emissions*.csv
-# MAGIC rm -rf *Temperatures*.csv
+'''
+Clear out existing working directory
+'''
+current_user=dbutils.notebook.entry_point.getDbutils().notebook().getContext().userName().get().split("@")[0]
+working_directory=f"/FileStore/{current_user}/dataIngestion"
+dbutils.fs.rm(working_directory, True)
 
 # COMMAND ----------
 
@@ -97,17 +99,13 @@ print("filenames:", filenames)
 # COMMAND ----------
 
 # Set up a DBFS directory to keep a copy of our data in a distributed filesystem (rather than local/single-node)
-# Copy over the files from the local filesystem to our new DBFS directory (mini-project)
+# Copy over the files from the local filesystem to our new DBFS directory
 # (so that Spark can read in a performant manner from dbfs:/)
 
-MINI_PROJECT_DIR = "dbfs:/FileStore/mini-project/"
-dbutils.fs.rm(MINI_PROJECT_DIR, True) # delete directory, start fresh
-dbutils.fs.mkdirs(MINI_PROJECT_DIR)
-
 for filename in filenames: # copy from local file system into a distributed file system such as DBFS
-  dbutils.fs.cp(f"file:{LOCAL_DIR}/{filename}", f"{MINI_PROJECT_DIR}{filename}")
+  dbutils.fs.cp(f"file:{LOCAL_DIR}/{filename}", f"{working_directory}/{filename}")
   
-DBFS_FILEPATHS = [x.path for x in dbutils.fs.ls(MINI_PROJECT_DIR)]
+DBFS_FILEPATHS = [x.path for x in dbutils.fs.ls(working_directory)]
 print(DBFS_FILEPATHS)
 CO2_PATH, GLOBAL_TEMPERATURES_PATH, TEMPERATURES_BY_COUNTRY_PATH = DBFS_FILEPATHS
 
@@ -118,7 +116,7 @@ CO2_PATH, GLOBAL_TEMPERATURES_PATH, TEMPERATURES_BY_COUNTRY_PATH = DBFS_FILEPATH
 # MAGIC #### [Optional] Confused or curious about DBFS?
 # MAGIC - Don't worry! it's a bit confusing for everyone initially
 # MAGIC - [See this summary table and diagram](https://docs.databricks.com/data/databricks-file-system.html#summary-table-and-diagram)
-# MAGIC - [Having trouble with `/dbfs/` on Databricks Community Edition?](https://stackoverflow.com/questions/63608357/cant-access-dbfs-filestore-using-shell-commands-in-databricks-runtime-version#:~:text=The%20/dbfs%20mount%20doesn%27t%20work%20on%20Community%20Edition%20with%20DBR%20%3E%3D%207.x%20%2D%20it%27s%20a%20known%20limitation.)
+# MAGIC - [About FileStore](https://docs.databricks.com/data/filestore.html)
 
 # COMMAND ----------
 
@@ -275,7 +273,11 @@ display(fix_columns(co2_df))
 
 # MAGIC %md
 # MAGIC ## EXERCISE: Write to Parquet
-# MAGIC Now that we have a function that updates invalid characters in our columns in our DataFrames, the last step is to write our DataFrames out to the Parquet format. For this exercise, we'll write to a DBFS directory called (`dbfs:/FileStore/mini-project/data-ingestion/`) so that we can use the output for another exercise in the future.
+# MAGIC Now that we have a function that updates invalid characters in our columns in our DataFrames, the last step is to write our DataFrames out to the Parquet format. For this exercise, we'll write to a DBFS directory called (`dbfs:/FileStore/YOUR_USERNAME/dataIngestion/`) so that we can use the output for another exercise in the future.
+# MAGIC 
+# MAGIC YOUR_USERNAME is your Databricks username (minus @DOMAIN, e.g. foobar in foobar@example.com). There is a helper function called current_user which returns your username (e.g. foobar)
+# MAGIC 
+# MAGIC HINT: Similar to the above example, we can use a helper variable called working_directory which is equal to /FileStore/{current_user}/dataIngestion.
 # MAGIC 
 # MAGIC **Requirements**
 # MAGIC - Each output dataset must be in Parquet format
@@ -288,29 +290,24 @@ display(fix_columns(co2_df))
 
 # Write co2_df to parquet
 
-EMISSIONS_OUTPUT_FILENAME = "EmissionsByCountry.parquet"
-EMISSIONS_OUTPUT_PATH = MINI_PROJECT_DIR + "data-ingestion/" + EMISSIONS_OUTPUT_FILENAME + "/"
-dbutils.fs.rm(EMISSIONS_OUTPUT_PATH, True)
-print(EMISSIONS_OUTPUT_PATH)
-
 # How do we ensure the output dataset will have only 1 partition?
 # Check out: https://spark.apache.org/docs/latest/api/python/reference/api/pyspark.sql.DataFrame.coalesce.html
-# Not to be confused with pyspark.sql.functions.coalesce! (you'll see this later in the mini-project)
+# Not to be confused with pyspark.sql.functions.coalesce! (you'll see this later)
 
 co2_fixed = fix_columns(co2_df).coalesce(1) 
-co2_write_resp = co2_fixed.write.format("parquet").mode("overwrite").save(EMISSIONS_OUTPUT_PATH)
+co2_write_resp = co2_fixed.write.format("parquet").mode("overwrite").save(f"{working_directory}/EmissionsByCountry.parquet")
 assert (co2_write_resp is None)
 
 # COMMAND ----------
 
 # Confirm files have been written
 # there should be only ONE .snappy.parquet file (i.e. ONE partition)
-dbutils.fs.ls(EMISSIONS_OUTPUT_PATH)
+dbutils.fs.ls(f"{working_directory}/EmissionsByCountry.parquet")
 
 # COMMAND ----------
 
 # Confirm written parquet file can be read again
-read_co2_df = spark.read.parquet(EMISSIONS_OUTPUT_PATH)
+read_co2_df = spark.read.parquet(f"{working_directory}/EmissionsByCountry.parquet")
 display(read_co2_df)
 
 # COMMAND ----------
@@ -319,23 +316,23 @@ display(read_co2_df)
 # MAGIC ## On your own
 # MAGIC Similar to how we wrote `co2_df` to a parquet file, please do the same for `global_temperatures_df` and `temperatures_by_country_df`. Don't forget to `coalesce(1)` from the above example. 
 # MAGIC 
+# MAGIC `YOUR_USERNAME` is your Databricks username (minus `@DOMAIN`, e.g. `foobar` in `foobar@example.com`). There is a helper function called `current_user` which returns your username (e.g. `foobar`)
+# MAGIC 
+# MAGIC **HINT:** Similar to the above example, we can use a helper variable called `working_directory` which is equal to `/FileStore/{current_user}/dataIngestion`.
+# MAGIC 
 # MAGIC | DataFrame | Output Path |
 # MAGIC | --- | --- |
-# MAGIC | global_temperatures_df | dbfs:/FileStore/mini-project/data-ingestion/GlobalTemperatures.parquet/ |
-# MAGIC | temperatures_by_country_df | dbfs:/FileStore/mini-project/data-ingestion/TemperaturesByCountry.parquet/ |
+# MAGIC | global_temperatures_df | dbfs:/FileStore/YOUR_USERNAME/dataIngestion/GlobalTemperatures.parquet/ |
+# MAGIC | temperatures_by_country_df | dbfs:/FileStore/YOUR_USERNAME/dataIngestion/TemperaturesByCountry.parquet/ |
 
 # COMMAND ----------
 
 GLOBAL_TEMPS_OUTPUT_FILENAME = "GlobalTemperatures.parquet"
-GLOBAL_TEMPS_OUTPUT_PATH = MINI_PROJECT_DIR + "data-ingestion/" + GLOBAL_TEMPS_OUTPUT_FILENAME + "/"
-dbutils.fs.rm(GLOBAL_TEMPS_OUTPUT_PATH, True)
 
 global_temperatures_fixed = NotImplemented
 global_temperatures_write_resp = NotImplemented
 
 COUNTRY_TEMPS_OUTPUT_FILENAME = "TemperaturesByCountry.parquet"
-COUNTRY_TEMPS_OUTPUT_PATH = MINI_PROJECT_DIR + "data-ingestion/" + COUNTRY_TEMPS_OUTPUT_FILENAME + "/"
-dbutils.fs.rm(COUNTRY_TEMPS_OUTPUT_PATH, True)
 
 temperatures_by_country_fixed = NotImplemented
 temperatures_by_country_write_resp = NotImplemented
@@ -347,25 +344,21 @@ if any(x is NotImplemented for x in [global_temperatures_write_resp, temperature
 
 ######### SOLUTION ##########
 GLOBAL_TEMPS_OUTPUT_FILENAME = "GlobalTemperatures.parquet"
-GLOBAL_TEMPS_OUTPUT_PATH = MINI_PROJECT_DIR + "data-ingestion/" + GLOBAL_TEMPS_OUTPUT_FILENAME + "/"
-dbutils.fs.rm(GLOBAL_TEMPS_OUTPUT_PATH, True)
 
 global_temperatures_fixed = fix_columns(global_temperatures_df).coalesce(1)
 global_temperatures_write_resp = (
   global_temperatures_fixed
     .write.format("parquet").mode("overwrite")
-    .save(GLOBAL_TEMPS_OUTPUT_PATH)
+    .save(f"{working_directory}/{GLOBAL_TEMPS_OUTPUT_FILENAME}")
 )
 
 COUNTRY_TEMPS_OUTPUT_FILENAME = "TemperaturesByCountry.parquet"
-COUNTRY_TEMPS_OUTPUT_PATH = MINI_PROJECT_DIR + "data-ingestion/" + COUNTRY_TEMPS_OUTPUT_FILENAME + "/"
-dbutils.fs.rm(COUNTRY_TEMPS_OUTPUT_PATH, True)
 
 temperatures_by_country_fixed = fix_columns(temperatures_by_country_df).coalesce(1)
 temperatures_by_country_write_resp = (
   temperatures_by_country_fixed
     .write.format("parquet").mode("overwrite")
-    .save(COUNTRY_TEMPS_OUTPUT_PATH)
+    .save(f"{working_directory}/{COUNTRY_TEMPS_OUTPUT_FILENAME}")
 )
 
 if any(x is NotImplemented for x in [global_temperatures_write_resp, temperatures_by_country_write_resp]):
@@ -373,9 +366,7 @@ if any(x is NotImplemented for x in [global_temperatures_write_resp, temperature
 
 # COMMAND ----------
 
-INGESTION_OUTPUTS_DIR = MINI_PROJECT_DIR + "data-ingestion" + "/"
-
-path = dbutils.fs.ls(INGESTION_OUTPUTS_DIR)
+path = dbutils.fs.ls(f"{working_directory}")
 files_df = spark.createDataFrame(path)
 assert files_df.filter(F.col('name') == "EmissionsByCountry.parquet/").count() == 1, "EmissionsByCountry.parquet/ is missing"
 assert files_df.filter(F.col('name') == "GlobalTemperatures.parquet/").count() == 1, "GlobalTemperatures.parquet/ is missing"
@@ -393,7 +384,3 @@ print("All tests passed :)")
 # COMMAND ----------
 
 display(temperatures_by_country_df)
-
-# COMMAND ----------
-
-
