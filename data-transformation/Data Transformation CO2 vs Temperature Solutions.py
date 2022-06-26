@@ -69,10 +69,12 @@ TEMPERATURES_BY_COUNTRY_URL = "https://raw.githubusercontent.com/data-derp/exerc
 
 # COMMAND ----------
 
-# MAGIC %sh
-# MAGIC # clear out all potentially duplicative Parquet files in local filesystem
-# MAGIC rm -rf *Emissions*.parquet
-# MAGIC rm -rf *Temperatures*.parquet
+'''
+Clear out existing working directory
+'''
+current_user=dbutils.notebook.entry_point.getDbutils().notebook().getContext().userName().get().split("@")[0]
+working_directory=f"/tmp/{current_user}/dataTransformation"
+dbutils.fs.rm(working_directory, True)
 
 # COMMAND ----------
 
@@ -100,7 +102,7 @@ print("filenames:", filenames)
 # Copy over the files from the local filesystem to our new DBFS directory (mini-project)
 # (so that Spark can read in a performant manner from dbfs:/)
 
-EXERCISE_DIR = "dbfs:/FileStore/mini-project/data-transformation/"
+EXERCISE_DIR = f"dbfs:/FileStore/{current_user}/data-transformation/"
 dbutils.fs.rm(EXERCISE_DIR, True) # delete directory, start fresh
 dbutils.fs.mkdirs(EXERCISE_DIR)
 
@@ -110,13 +112,6 @@ for filename in filenames: # copy from local file system into a distributed file
 DBFS_FILEPATHS = [x.path for x in dbutils.fs.ls(EXERCISE_DIR)]
 print(DBFS_FILEPATHS)
 CO2_PATH, GLOBAL_TEMPERATURES_PATH, TEMPERATURES_BY_COUNTRY_PATH = DBFS_FILEPATHS
-
-# COMMAND ----------
-
-# Starting Spark Session (not needed if using Databricks)
-# from pyspark.sql import SparkSession
-# spark = SparkSession.builder.getOrCreate()
-# print("Spark Session created.")
 
 # COMMAND ----------
 
@@ -591,7 +586,8 @@ display(global_emissions_temperatures)
 # Write DataFrame to Parquet
 global_emissions_temperatures.coalesce(1).orderBy("Year") \
     .write.format("parquet").mode("overwrite") \
-    .save("tmp/dataTransformation/GlobalEmissionsVsTemperatures.parquet")
+    .parquet(f"{working_directory}/GlobalEmissionsVsTemperatures.parquet")
+
 
 # COMMAND ----------
 
@@ -917,7 +913,7 @@ display(country_emissions_temperatures)
 
 country_emissions_temperatures.coalesce(1).orderBy("Year") \
     .write.format("parquet").mode("overwrite") \
-    .save("tmp/dataTransformation/CountryEmissionsVsTemperatures.parquet")
+    .save(f"{working_directory}/CountryEmissionsVsTemperatures.parquet")
 
 # COMMAND ----------
 
@@ -1050,7 +1046,7 @@ display(europe_big_three_emissions)
 
 europe_big_three_emissions.coalesce(1).orderBy("Year") \
   .write.format("parquet").mode("overwrite") \
-  .save("tmp/dataTransformation/EuropeBigThreeEmissions.parquet")
+  .save(f"{working_directory}/EuropeBigThreeEmissions.parquet")
 
 # COMMAND ----------
 
@@ -1299,7 +1295,7 @@ display(oceania_emissions_edited)
 
 oceania_emissions_edited.coalesce(1).orderBy("Year") \
   .write.format("parquet").mode("overwrite") \
-  .save('/tmp/dataTransformation/OceaniaEmissionsEdited.parquet')
+  .save(f"{working_directory}/OceaniaEmissionsEdited.parquet")
 
 # COMMAND ----------
 
@@ -1369,10 +1365,10 @@ def test_run():
   """High level job test: count + schema checks but nothing more granular"""
 
   output_paths = {
-    "co2_temperatures_global": "/tmp/dataTransformation/GlobalEmissionsVsTemperatures.parquet",
-    "co2_temperatures_country": "/tmp/dataTransformation/CountryEmissionsVsTemperatures.parquet",
-    "europe_big_3_co2": "/tmp/dataTransformation/EuropeBigThreeEmissions.parquet",
-    "co2_oceania": "/tmp/dataTransformation/OceaniaEmissionsEdited.parquet"
+    "co2_temperatures_global": f"{working_directory}/GlobalEmissionsVsTemperatures.parquet",
+    "co2_temperatures_country": f"{working_directory}/CountryEmissionsVsTemperatures.parquet",
+    "europe_big_3_co2": f"{working_directory}/EuropeBigThreeEmissions.parquet",
+    "co2_oceania": f"{working_directory}/OceaniaEmissionsEdited.parquet"
 
   }
   expected_metadata_dict = get_expected_metadata()
@@ -1380,6 +1376,7 @@ def test_run():
 
   for (path, expected) in list(zip(output_paths.values(), expected_metadata)):
       files = dbutils.fs.ls(path)
+      
       files_df = spark.createDataFrame(files)
       snappy_parquet_files = files_df.filter(files_df.name.endswith('.snappy.parquet'))
       success_files = files_df.filter(files_df.name.endswith('_SUCCESS'))
