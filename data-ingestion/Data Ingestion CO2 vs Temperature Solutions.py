@@ -83,18 +83,23 @@ TEMPERATURES_BY_COUNTRY_URL = "https://raw.githubusercontent.com/data-derp/exerc
 import os
 import wget
 import sys
-sys.stdout.fileno = lambda: False # prevents AttributeError: 'ConsoleBuffer' object has no attribute 'fileno'  
+import shutil
 
+ 
+sys.stdout.fileno = lambda: False # prevents AttributeError: 'ConsoleBuffer' object has no attribute 'fileno'   
+
+LOCAL_DIR = f"{os.getcwd()}/{current_user}/dataIngestion"
+
+if os.path.isdir(LOCAL_DIR): shutil.rmtree(LOCAL_DIR)
+os.makedirs(LOCAL_DIR)
 URLS = [CO2_URL, GLOBAL_TEMPERATURES_URL, TEMPERATURES_BY_COUNTRY_URL]
 filenames = []
 
 for url in URLS:
-  saved_filename = wget.download(url, url.split("/")[-1])
-  filenames.append(saved_filename)
-
-LOCAL_DIR = os.getcwd()
-print("LOCAL_DIR:", LOCAL_DIR)
-print("filenames:", filenames)
+  filename = url.split("/")[-1]
+  filenames.append(filename)
+  saved_filename = wget.download(url, out = f"{LOCAL_DIR}/{filename}")
+  print(f"Saved in: {saved_filename}")
 
 # COMMAND ----------
 

@@ -89,7 +89,7 @@ sys.stdout.fileno = lambda: False # prevents AttributeError: 'ConsoleBuffer' obj
 
 LOCAL_DIR = f"{os.getcwd()}/{current_user}/dataTransformation"
 
-shutil.rmtree(LOCAL_DIR)
+if os.path.isdir(LOCAL_DIR): shutil.rmtree(LOCAL_DIR)
 os.makedirs(LOCAL_DIR)
 URLS = [CO2_URL, GLOBAL_TEMPERATURES_URL, TEMPERATURES_BY_COUNTRY_URL]
 filenames = []
