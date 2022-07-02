@@ -38,8 +38,7 @@
 # MAGIC %md
 # MAGIC ## Setup: Download data from an online repository into a Spark DataFrame  
 # MAGIC 
-# MAGIC Ideally, you could already resume where you left off in the last exercise (i.e. picking up the Parquet files you generated yourself)  
-# MAGIC However, to ensure reproducibility for all participants, you can also follow the first exercise below to download the correct Parquet files
+# MAGIC We will resume where you left off in the last exercise (i.e. picking up the Parquet files you generated yourself). If that directory is empty, it will generate some fresh files for you.
 # MAGIC 
 # MAGIC - Reminder: Spark (at the time of writing) does not support reading data directly from arbitrary http(s) addresses.
 # MAGIC - In practice, **you would not want to do this with big data anyways**.  
@@ -50,7 +49,7 @@
 # MAGIC - For the sake of simplicity in this exercise, let's not worry about transferring these datasets to S3 yet
 # MAGIC 
 # MAGIC **Objectives**
-# MAGIC - Let's simply download the data first, then read the Parquet files with Spark
+# MAGIC - Let's simply download the data first (if they don't already exist from the previous exercise), then read the Parquet files with Spark
 # MAGIC - Run the following cells and inspect the resulting DataFrames
 
 # COMMAND ----------
@@ -59,59 +58,98 @@
 
 # COMMAND ----------
 
-# Set URLS of input parquet data
+# Clear out existing working directory
 
-CO2_URL = "https://raw.githubusercontent.com/data-derp/exercise-co2-vs-temperature/master/data-transformation/input-data/EmissionsByCountry.parquet/part-00000-a5120099-3f2e-437a-98c6-feb2845cdf28-c000.snappy.parquet"
-
-GLOBAL_TEMPERATURES_URL = "https://raw.githubusercontent.com/data-derp/exercise-co2-vs-temperature/master/data-transformation/input-data/GlobalTemperatures.parquet/part-00000-f77d0e73-78da-48a2-be74-681dd35a82cf-c000.snappy.parquet"
-
-TEMPERATURES_BY_COUNTRY_URL = "https://raw.githubusercontent.com/data-derp/exercise-co2-vs-temperature/master/data-transformation/input-data/TemperaturesByCountry.parquet/part-00000-b9e4293b-b7a5-4582-86d1-eccf44649b40-c000.snappy.parquet"
-
-# COMMAND ----------
-
-'''
-Clear out existing working directory
-'''
 current_user=dbutils.notebook.entry_point.getDbutils().notebook().getContext().userName().get().split("@")[0]
 working_directory=f"/FileStore/{current_user}/dataTransformation"
 dbutils.fs.rm(working_directory, True)
 
 # COMMAND ----------
 
-# Download files to the local filesystem
-import os
+# Function that checks that files exist from the previous exercise
+
+def contains_expected_files(dir, expected_files):
+    match_expected_extensions=lambda x: x.endswith(tuple(expected_files))
+    get_name=lambda x: x.name
+    try: 
+        num_matching_files = len(list(filter(match_expected_extensions, map(get_name, dbutils.fs.ls(dir)))))
+        return num_matching_files >= len(expected_ingestion_parquet_files)
+    except Exception as e:
+        if 'java.io.FileNotFoundException' in str(e):
+            return False
+        else:
+            raise
+
+# COMMAND ----------
+
+# Function to download files to DBFS
+
+qqimport os
 import wget
 import sys
 import shutil
 
- 
 sys.stdout.fileno = lambda: False # prevents AttributeError: 'ConsoleBuffer' object has no attribute 'fileno'   
 
-LOCAL_DIR = f"{os.getcwd()}/{current_user}/dataTransformation"
+def clean_remake_dir(dir):
+    if os.path.isdir(local_tmp_dir): shutil.rmtree(local_tmp_dir)
+    os.makedirs(local_tmp_dir)
+    
 
-if os.path.isdir(LOCAL_DIR): shutil.rmtree(LOCAL_DIR)
-os.makedirs(LOCAL_DIR)
-URLS = [CO2_URL, GLOBAL_TEMPERATURES_URL, TEMPERATURES_BY_COUNTRY_URL]
-filenames = []
+def download_to_local_dir(local_dir, target_dir, url, filename_parsing_lambda):
+    filename = (filename_parsing_lambda)(url)
+    tmp_path = f"{local_dir}/{filename}"
+    target_path = f"{target_dir}/{filename}"
+    if os.path.exists(tmp_path):
+        os.remove(tmp_path) 
+    
+    saved_filename = wget.download(url, out = tmp_path)
+    
+    if target_path.endswith(".zip"):
+        with zipfile.ZipFile(tmp_path, 'r') as zip_ref:
+            zip_ref.extractall(local_dir)
 
-for url in URLS:
-  filename = url.split("/")[-2]
-  filenames.append(filename)
-  saved_filename = wget.download(url, out = f"{LOCAL_DIR}/{filename}")
-  print(f"Saved in: {saved_filename}")
+    dbutils.fs.cp(f"file:{local_dir}/", target_dir, True)
+    
+    return target_path
 
 # COMMAND ----------
 
-# Set up a DBFS directory to keep a copy of our data in a distributed filesystem (rather than local/single-node)
-# Copy over the files from the local filesystem to our new DBFS directory
-# (so that Spark can read in a performant manner from dbfs:/)
+# If prerequisite files don't already exist, download them
 
-for filename in filenames: # copy from local file system into a distributed file system such as DBFS
-  dbutils.fs.cp(f"file:{LOCAL_DIR}/{filename}", f"""{working_directory}/{filename}""")
-  
-DBFS_FILEPATHS = [x.path for x in dbutils.fs.ls(working_directory)]
-print(DBFS_FILEPATHS)
-CO2_PATH, GLOBAL_TEMPERATURES_PATH, TEMPERATURES_BY_COUNTRY_PATH = DBFS_FILEPATHS
+import zipfile
+
+
+expected_ingestion_parquet_dirs = [
+    f"/FileStore/{current_user}/dataIngestion/EmissionsByCountry.parquet/",
+    f"/FileStore/{current_user}/dataIngestion/TemperaturesByCountry.parquet/",
+    f"/FileStore/{current_user}/dataIngestion/GlobalTemperatures.parquet/"
+]
+
+expected_ingestion_parquet_files = [
+    "_SUCCESS",
+    ".parquet"
+]
+
+expected_files_exist = all(list(map(lambda x: contains_expected_files(x, expected_ingestion_parquet_files), expected_ingestion_parquet_dirs)))
+
+source_directory = f"/FileStore/{current_user}/dataIngestion"
+
+if expected_files_exist:
+    print("Prerequisite files exist. Nothing to do here!")
+else:
+    print("Prerequisite files don't yet exist. Downloading...")
+    
+    local_tmp_dir = f"{os.getcwd()}/{current_user}/dataIngestion/tmp"
+    clean_remake_dir(local_tmp_dir)
+
+    url = "https://github.com/data-derp/exercise-co2-vs-temperature-databricks/blob/master/data-transformation/input-data/input-data.zip?raw=true"
+    
+    download_to_local_dir(local_tmp_dir, source_directory, url, lambda y: y.split("/")[-1].replace("?raw=true",""))
+    
+CO2_PATH=f"{source_directory}/EmissionsByCountry.parquet/"
+GLOBAL_TEMPERATURES_PATH=f"{source_directory}/GlobalTemperatures.parquet/"
+TEMPERATURES_BY_COUNTRY_PATH=f"{source_directory}/TemperaturesByCountry.parquet/"
 
 # COMMAND ----------
 
@@ -1393,3 +1431,7 @@ def test_run():
   print("All tests passed :)")
   
 test_run()  
+
+# COMMAND ----------
+
+
