@@ -63,56 +63,64 @@
 
 # COMMAND ----------
 
-'''
-Clear out existing working directory
-'''
+# Clear out existing working directory
+
 current_user=dbutils.notebook.entry_point.getDbutils().notebook().getContext().userName().get().split("@")[0]
 working_directory=f"/FileStore/{current_user}/dataIngestion"
 dbutils.fs.rm(working_directory, True)
 
 # COMMAND ----------
 
-# Set URLS of modified datasets
-CO2_URL = "https://raw.githubusercontent.com/data-derp/exercise-co2-vs-temperature/master/data-ingestion/input-data/EmissionsByCountry.csv"
-GLOBAL_TEMPERATURES_URL = "https://raw.githubusercontent.com/data-derp/exercise-co2-vs-temperature/master/data-ingestion/input-data/GlobalTemperatures.csv"
-TEMPERATURES_BY_COUNTRY_URL = "https://raw.githubusercontent.com/data-derp/exercise-co2-vs-temperature/master/data-ingestion/input-data/TemperaturesByCountry.csv"
+# Function to download files to DBFS
 
-# COMMAND ----------
-
-# Download files to the local filesystem
 import os
 import wget
 import sys
 import shutil
 
- 
 sys.stdout.fileno = lambda: False # prevents AttributeError: 'ConsoleBuffer' object has no attribute 'fileno'   
 
-LOCAL_DIR = f"{os.getcwd()}/{current_user}/dataIngestion"
+def clean_remake_dir(dir):
+    if os.path.isdir(local_tmp_dir): shutil.rmtree(local_tmp_dir)
+    os.makedirs(local_tmp_dir)
+    
 
-if os.path.isdir(LOCAL_DIR): shutil.rmtree(LOCAL_DIR)
-os.makedirs(LOCAL_DIR)
-URLS = [CO2_URL, GLOBAL_TEMPERATURES_URL, TEMPERATURES_BY_COUNTRY_URL]
-filenames = []
+def download_to_local_dir(local_dir, target_dir, url, filename_parsing_lambda):
+    filename = (filename_parsing_lambda)(url)
+    tmp_path = f"{local_dir}/{filename}"
+    target_path = f"{target_dir}/{filename}"
+    if os.path.exists(tmp_path):
+        os.remove(tmp_path) 
+    
+    saved_filename = wget.download(url, out = tmp_path)
+    
+    if target_path.endswith(".zip"):
+        with zipfile.ZipFile(tmp_path, 'r') as zip_ref:
+            zip_ref.extractall(local_dir)
 
-for url in URLS:
-  filename = url.split("/")[-1]
-  filenames.append(filename)
-  saved_filename = wget.download(url, out = f"{LOCAL_DIR}/{filename}")
-  print(f"Saved in: {saved_filename}")
+    dbutils.fs.cp(f"file:{local_dir}/", target_dir, True)
+    
+    return target_path
 
 # COMMAND ----------
 
-# Set up a DBFS directory to keep a copy of our data in a distributed filesystem (rather than local/single-node)
-# Copy over the files from the local filesystem to our new DBFS directory
-# (so that Spark can read in a performant manner from dbfs:/)
+local_tmp_dir = f"{os.getcwd()}/{current_user}/dataIngestion/tmp"
+clean_remake_dir(local_tmp_dir)
 
-for filename in filenames: # copy from local file system into a distributed file system such as DBFS
-  dbutils.fs.cp(f"file:{LOCAL_DIR}/{filename}", f"{working_directory}/{filename}")
-  
-DBFS_FILEPATHS = [x.path for x in dbutils.fs.ls(working_directory)]
-print(DBFS_FILEPATHS)
-CO2_PATH, GLOBAL_TEMPERATURES_PATH, TEMPERATURES_BY_COUNTRY_PATH = DBFS_FILEPATHS
+urls = [
+    "https://raw.githubusercontent.com/data-derp/exercise-co2-vs-temperature/master/data-ingestion/input-data/EmissionsByCountry.csv",
+    "https://raw.githubusercontent.com/data-derp/exercise-co2-vs-temperature/master/data-ingestion/input-data/GlobalTemperatures.csv",
+    "https://raw.githubusercontent.com/data-derp/exercise-co2-vs-temperature/master/data-ingestion/input-data/TemperaturesByCountry.csv"
+]
+    
+target_directory = f"/FileStore/{current_user}/dataIngestion"
+    
+for url in urls:    
+    download_to_local_dir(local_tmp_dir, target_directory, url, lambda y: y.split("/")[-1].replace("?raw=true",""))
+    
+CO2_PATH=f"{target_directory}/EmissionsByCountry.csv/"
+GLOBAL_TEMPERATURES_PATH=f"{target_directory}/GlobalTemperatures.csv/"
+TEMPERATURES_BY_COUNTRY_PATH=f"{target_directory}/TemperaturesByCountry.csv/"
 
 # COMMAND ----------
 

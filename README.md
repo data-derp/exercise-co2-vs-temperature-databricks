@@ -63,3 +63,6 @@ They can be found at:
 4. Follow instructions, move on to following exercises once all tests pass.
 
 5. Once you're done, import the solutions `Data Ingestion CO2 vs Temperature Solutions.py` notebook to check your answers: `https://raw.githubusercontent.com/data-derp/exercise-co2-vs-temperature-databricks/master/data-transformation/Data%20Transformation%20CO2%20vs%20Temperature%20Solutions.py`
+
+## Developing
+When uploading new datasets from a Mac, you might have to run `zip -d input-data.zip __MACOSX/\*` after zipping so that this hidden file gets removed
