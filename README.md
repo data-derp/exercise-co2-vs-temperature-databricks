@@ -26,43 +26,11 @@ They can be found at:
 * Basic knowledge of Spark
 * [Databricks Account](#create-a-databricks-community-account)
 
-## Quickstart
-1. Set up a [Databricks Account](https://github.com/data-derp/documentation/blob/master/databricks/README.md)
-2. [Create a cluster](https://github.com/data-derp/documentation/blob/master/databricks/setup-cluster.md)
+## Exercises
+1. [Data Ingestion](./data-ingestion/README.md)
+2. [Data Transformation]((./data-transformation/README.md))
 
-### Data Ingestion
-1. In your User's workspace, click import
-   
-   ![databricks-import](https://github.com/data-derp/documentation/blob/master/databricks/assets/databricks-import.png?raw=true)
-
-2. Import the `Data Ingestion CO2 vs Temperature.py` notebook: `https://raw.githubusercontent.com/data-derp/exercise-co2-vs-temperature-databricks/master/data-ingestion/Data%20Ingestion%20CO2%20vs%20Temperature.py`
-   
-   ![databricks-import-url](https://github.com/data-derp/documentation/blob/master/databricks/assets/databricks-import-url.png?raw=true)
-
-3. Select your cluster
-
-   ![databricks-select-cluster.png](https://github.com/data-derp/documentation/blob/master/databricks/assets/databricks-select-cluster.png?raw=true)
-
-4. Follow instructions, move on to following exercises once all tests pass.
-
-5. Once you're done, import the solutions `Data Ingestion CO2 vs Temperature Solutions.py` notebook to check your answers: `https://raw.githubusercontent.com/data-derp/exercise-co2-vs-temperature-databricks/master/data-ingestion/Data%20Ingestion%20CO2%20vs%20Temperature%20Solutions.py`
-
-### Data Transformation
-1. In your User's workspace, click import
-
-   ![databricks-import](https://github.com/data-derp/documentation/blob/master/databricks/assets/databricks-import.png?raw=true)
-
-2. Import the `Data Transformation CO2 vs Temperature.py` notebook: `https://raw.githubusercontent.com/data-derp/exercise-co2-vs-temperature-databricks/master/data-transformation/Data%20Transformation%20CO2%20vs%20Temperature.py`
-
-   ![databricks-import-url](https://github.com/data-derp/documentation/blob/master/databricks/assets/databricks-import-url.png?raw=true)
-
-3. Select your cluster
-
-   ![databricks-select-cluster.png](https://github.com/data-derp/documentation/blob/master/databricks/assets/databricks-select-cluster.png?raw=true)
-
-4. Follow instructions, move on to following exercises once all tests pass.
-
-5. Once you're done, import the solutions `Data Ingestion CO2 vs Temperature Solutions.py` notebook to check your answers: `https://raw.githubusercontent.com/data-derp/exercise-co2-vs-temperature-databricks/master/data-transformation/Data%20Transformation%20CO2%20vs%20Temperature%20Solutions.py`
-
-## Developing
-When uploading new datasets from a Mac, you might have to run `zip -d input-data.zip __MACOSX/\*` after zipping so that this hidden file gets removed
+## Contributing
+### Some hints
+* It's easiest to make changes to the Solutions notebooks, then clone it, remove the code blocks clearly marked solutions
+* When uploading new datasets from a Mac, you might have to run `zip -d input-data.zip __MACOSX/\*` after zipping so that this hidden file gets removed
