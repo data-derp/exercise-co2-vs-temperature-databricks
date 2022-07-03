@@ -84,7 +84,7 @@ def contains_expected_files(dir, expected_files):
 
 # Function to download files to DBFS
 
-qqimport os
+import os
 import wget
 import sys
 import shutil
