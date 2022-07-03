@@ -29,6 +29,7 @@ They can be found at:
 ## Exercises
 1. [Data Ingestion](./data-ingestion/README.md)
 2. [Data Transformation]((./data-transformation/README.md))
+3. [Data Visualisation]((./data-visualisation/README.md))
 
 ## Contributing
 ### Some hints
