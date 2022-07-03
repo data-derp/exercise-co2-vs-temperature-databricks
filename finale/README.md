@@ -6,7 +6,7 @@
 
    ![databricks-import](https://github.com/data-derp/documentation/blob/master/databricks/assets/databricks-import.png?raw=true)
 
-4. Import the `Project-Finale-CO2.py` notebook: `https://raw.githubusercontent.com/data-derp/small-exercises/master/project-finale-co2/Project-Finale-CO2.py`
+4. Import the `Project-Finale-CO2.py` notebook: `https://raw.githubusercontent.com/data-derp/exercise-co2-vs-temperature-databricks/master/finale/Project-Finale-CO2.py`
 
    ![databricks-import-url](https://github.com/data-derp/documentation/blob/master/databricks/assets/databricks-import-url.png?raw=true)
 

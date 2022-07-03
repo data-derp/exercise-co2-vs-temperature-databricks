@@ -9,7 +9,7 @@ In this exercise, we assume that you've completed the Data Ingestion and Data Tr
 
    ![databricks-import](https://github.com/data-derp/documentation/blob/master/databricks/assets/databricks-import.png?raw=true)
 
-4. Import the `Data Visualisation CO2 vs Temperature.py` notebook using the URL method: `https://github.com/data-derp/exercise-co2-vs-temperature-visualisation/blob/master/Data%20Visualisation%20CO2%20vs.%20Temperature.py`
+4. Import the `Data Visualisation CO2 vs Temperature.py` notebook using the URL method: `https://github.com/data-derp/exercise-co2-vs-temperature-databricks/blob/master/data-visualisation/Data%20Visualisation%20CO2%20vs.%20Temperature.py`
 
    ![databricks-import-url](https://github.com/data-derp/documentation/blob/master/databricks/assets/databricks-import-url.png?raw=true)
 
