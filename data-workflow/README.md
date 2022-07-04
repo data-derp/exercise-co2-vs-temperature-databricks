@@ -3,7 +3,8 @@
 2. [Create a cluster](https://github.com/data-derp/documentation/blob/master/databricks/setup-cluster.md) if you don't already have one
 3. On the sidebar menu, click the workflows icon
 
-![img.png](img.png)
+![databricks-workflows-icon.png](./assets/databricks-workflows-icon.png)
+![<img src="./assetsdatabricks-workflows-icon.png" width="30" />](./assetsdatabricks-workflows-icon.png)
 
 5. Create a task with a unique name for the Ingestion task (select your Ingestion notebook in your workspace and select YOUR cluster)
 
