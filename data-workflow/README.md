@@ -7,16 +7,16 @@
 
 5. Create a task with a unique name for the Ingestion task (select your Ingestion notebook in your workspace and select YOUR cluster)
 
-![databricks-workflow-ingestion-task.png](./assets/databricks-workflow-ingestion-task.png)
+![databricks-workflow-ingestion-task.png](./assets/databricks-workflow-ingestion-task.png | width=200)
 
 6. Once you have created the Ingestion task, click the PLUS button to add your Transformation task. 
 
-![databricks-task-add.png](./assets/databricks-task-add.png)
+![databricks-task-add.png](./assets/databricks-task-add.png | width=200)
 
 7. Create a task with a unique name for the Transformation task (select your Transformation notebook in your workspace and select YOUR cluster)
 
-![databricks-workflow-transformation-task.png](./assets/databricks-workflow-transformation-task.png)
+![databricks-workflow-transformation-task.png](./assets/databricks-workflow-transformation-task.png | width=200)
 
 8. Back in the workflows menu, click play to kick off your task
 
-![databricks-workflow-trigger.png](./assets/databricks-workflow-trigger.png)
+![databricks-workflow-trigger.png](./assets/databricks-workflow-trigger.png | width=200)
