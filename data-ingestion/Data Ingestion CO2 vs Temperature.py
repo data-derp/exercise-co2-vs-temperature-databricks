@@ -280,7 +280,7 @@ display(fix_columns(co2_df))
 # Write co2_df to parquet
 
 # How do we ensure the output dataset will have only 1 partition?
-# Check out: https://spark.apache.org/docs/latest/api/python/reference/api/pyspark.sql.DataFrame.coalesce.html
+# Check out: https://spark.apache.org/docs/latest/api/python/reference/pyspark.sql/api/pyspark.sql.DataFrame.coalesce.html
 # Not to be confused with pyspark.sql.functions.coalesce! (you'll see this later)
 
 co2_fixed = fix_columns(co2_df).coalesce(1) 
