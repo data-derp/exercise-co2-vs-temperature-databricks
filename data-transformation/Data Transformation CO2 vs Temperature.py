@@ -1243,23 +1243,37 @@ def test_run():
   
   print("All tests passed :)")
   
-test_run()  
+test_run()
 
 # COMMAND ----------
 
 # MAGIC %md
 # MAGIC ## Write data out to a Hive table
-# MAGIC ...so that others can query it and you can create dashboards from it
+# MAGIC ...so that others can query it and you can create dashboards from it.
 
 # COMMAND ----------
 
-# Create a unique table name from your current user
+# Create a unique db name from your current_user
 import re
-table_name = re.sub('[^A-Za-z0-9]+', '', current_user)
+db = re.sub('[^A-Za-z0-9]+', '', current_user)
 
-print(f"Table name: {table_name}")
+print(f"DB name: {db}")
+
+spark.sql(f"CREATE DATABASE IF NOT EXISTS {db}")
+spark.sql(f"USE {db}")
+
+# Clean up tables by the the same name
+dbutils.fs.rm(f'/user/hive/warehouse/{db}.db', True)
+
+table_name = "data_transformation"
 
 # COMMAND ----------
+
+dbutils.fs.ls(f'/user/hive/warehouse/{db}.db')
+
+# COMMAND ----------
+
+# Note: There is another (and better way to do this) which is to create a hive schema from your schema and reference the location of your data in cloud storage. We'll demonstrate this in the next version of this notebook, but for now, to get a taster of how Databricks SQL works, we'll do it the cheap and dirty way by saving the entire dataframe as a table.
 
 global_emissions_temperatures.coalesce(1).orderBy("Year") \
     .write.format("parquet").mode("overwrite") \
@@ -1287,5 +1301,12 @@ print(f"Wrote to table: {table_name}_country_emissions")
 
 # COMMAND ----------
 
+# MAGIC %md
+# MAGIC ## View your data in Databricks SQL
+# MAGIC Pick the SQL Persona on the toolbar on the left, select your table, and run a query.
+# MAGIC
+# MAGIC ![databricks-sql-persona](https://github.com/data-derp/exercise-co2-vs-temperature-databricks/blob/master/data-transformation/assets/databricks-sql-persona.png?raw=true)
+
+# COMMAND ----------
 
 
