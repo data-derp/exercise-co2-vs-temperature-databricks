@@ -1248,8 +1248,10 @@ test_run()
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## Write data out to a Hive table
+# MAGIC ## Write data out to a Managed Table
 # MAGIC ...so that others can query it and you can create dashboards from it.
+# MAGIC
+# MAGIC Note: just because it's using a Hive metastore doesn't make them Hive Tables
 
 # COMMAND ----------
 
@@ -1262,9 +1264,6 @@ print(f"DB name: {db}")
 spark.sql(f"CREATE DATABASE IF NOT EXISTS {db}")
 spark.sql(f"USE {db}")
 
-# Clean up tables by the the same name
-dbutils.fs.rm(f'/user/hive/warehouse/{db}.db', True)
-
 table_name = "data_transformation"
 
 # COMMAND ----------
@@ -1273,31 +1272,29 @@ dbutils.fs.ls(f'/user/hive/warehouse/{db}.db')
 
 # COMMAND ----------
 
-# Note: There is another (and better way to do this) which is to create a hive schema from your schema and reference the location of your data in cloud storage. We'll demonstrate this in the next version of this notebook, but for now, to get a taster of how Databricks SQL works, we'll do it the cheap and dirty way by saving the entire dataframe as a table.
-
 global_emissions_temperatures.coalesce(1).orderBy("Year") \
     .write.format("parquet").mode("overwrite") \
-    .saveAsTable(f'{table_name}_global_emissions')
+    .saveAsTable(f'{db}.{table_name}_global_emissions')
 
-print(f"Wrote to table: {table_name}_global_emissions")
+print(f"Wrote to table: {db}.{table_name}_global_emissions")
 
 oceania_emissions_edited.coalesce(1).orderBy("Year") \
     .write.format('parquet').mode("overwrite") \
-    .saveAsTable(f'{table_name}_oceania_emissions')
+    .saveAsTable(f'{db}.{table_name}_oceania_emissions')
 
-print(f"Wrote to table: {table_name}_oceania_emissions")
+print(f"Wrote to table: {db}.{table_name}_oceania_emissions")
 
 europe_big_three_emissions.coalesce(1).orderBy("Year") \
     .write.format("parquet").mode("overwrite") \
-    .saveAsTable(f'{table_name}_europe_big_three')
+    .saveAsTable(f'{db}.{table_name}_europe_big_three')
 
-print(f"Wrote to table: {table_name}_europe_big_three")
+print(f"Wrote to table: {db}.{table_name}_europe_big_three")
 
 country_emissions_temperatures.coalesce(1).orderBy("Year") \
     .write.format("parquet").mode("overwrite") \
-    .saveAsTable(f'{table_name}_country_emissions')
+    .saveAsTable(f'{db}.{table_name}_country_emissions')
 
-print(f"Wrote to table: {table_name}_country_emissions")
+print(f"Wrote to table: {db}.{table_name}_country_emissions")
 
 # COMMAND ----------
 
