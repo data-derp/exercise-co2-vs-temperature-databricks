@@ -1436,4 +1436,44 @@ test_run()
 
 # COMMAND ----------
 
+# MAGIC %md
+# MAGIC ## Write data out to a Hive table
+# MAGIC ...so that others can query it and you can create dashboards from it
+
+# COMMAND ----------
+
+# Create a unique table name from your current user
+import re
+table_name = re.sub('[^A-Za-z0-9]+', '', current_user)
+
+print(f"Table name: {table_name}")
+
+# COMMAND ----------
+
+global_emissions_temperatures.coalesce(1).orderBy("Year") \
+    .write.format("parquet").mode("overwrite") \
+    .saveAsTable(f'{table_name}_global_emissions')
+
+print(f"Wrote to table: {table_name}_global_emissions")
+
+oceania_emissions_edited.coalesce(1).orderBy("Year") \
+    .write.format('parquet').mode("overwrite")\
+    .saveAsTable(f'{table_name}_oceania_emissions')
+
+print(f"Wrote to table: {table_name}_oceania_emissions")
+
+europe_big_three_emissions.coalesce(1).orderBy("Year") \
+  .write.format("parquet").mode("overwrite") \
+  .saveAsTable(f'{table_name}_europe_big_three')
+
+print(f"Wrote to table: {table_name}_europe_big_three")
+
+country_emissions_temperatures.coalesce(1).orderBy("Year") \
+    .write.format("parquet").mode("overwrite") \
+    .saveAsTable(f'{table_name}_country_emissions')
+
+print(f"Wrote to table: {table_name}_country_emissions")
+
+# COMMAND ----------
+
 
