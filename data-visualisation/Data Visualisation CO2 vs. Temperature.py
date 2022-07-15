@@ -119,10 +119,14 @@ display(spark.createDataFrame(dbutils.fs.ls(source_directory)))
 europe_big_three_emissions_df = spark.read.parquet(f"{source_directory}/EuropeBigThreeEmissions.parquet/")
 display(europe_big_three_emissions_df)
 
-# COMMAND ----------
+country_emissions_vs_temp_df = spark.read.parquet(f"{source_directory}/CountryEmissionsVsTemperatures.parquet/")
+display(country_emissions_vs_temp_df)
 
-## If you would like to experiment with Machine Learning
-import sklearn
+global_emissions_vs_temp_df = spark.read.parquet(f"{source_directory}/GlobalEmissionsVsTemperatures.parquet/")
+display(global_emissions_vs_temp_df)
+
+oceania_emissions_df = spark.read.parquet(f"{source_directory}/OceaniaEmissionsEdited.parquet/")
+display(oceania_emissions_df)
 
 # COMMAND ----------
 
@@ -142,12 +146,94 @@ fig
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## Exercise: Visualise CO2 vs. Temperature Data
-# MAGIC Use Plotly to play around with the project data to see if you can come up with meaningful visualisations that answer our original questions:
+# MAGIC 
+# MAGIC ## A Simple Example
+# MAGIC Let's plot our TotalEmissions against LandAverageTemperature in order to see the relationship between the two.
+# MAGIC 
+# MAGIC We first need to convert our Dataframe to Pandas and then pass that dataset to plotly.
+
+# COMMAND ----------
+
+df = global_emissions_vs_temp_df.select("Year", "TotalEmissions", "LandMaxTemperature").orderBy("TotalEmissions").toPandas()
+
+# COMMAND ----------
+
+import plotly.express as px
+
+fig = px.line(df, x="TotalEmissions", y="LandMaxTemperature")
+
+fig.show()
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ### Questions to reflect upon:
+# MAGIC * Why might you want to `orderBy` TotalEmissions?
+# MAGIC * What units are each of the Axes?
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## Exercises
+# MAGIC Remember that some of our original questions were the following:
 # MAGIC * Which countries are worse-hit (higher temperature anomalies)?
 # MAGIC * Which countries are the biggest emitters?
 # MAGIC * What are some attempts of ranking “biggest polluters” in a sensible way?
+# MAGIC 
+# MAGIC In the following exercises, we'll answer some of those questions with respect to the transformed data that we created in the previous exercise.
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ### Exercise: Biggest Emitters
+# MAGIC Which countries/continents are the top 3 emitters? Plot the emissions from each country in  `country_emissions_vs_temp_df` to find out.
 
 # COMMAND ----------
 
 
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ### Exercise: Europe's Biggest Polluters
+# MAGIC Between the Europe big three (Germany, France, UK), which one is the worst polluter? Use `europe_big_three_emissions_df` to find out.
+
+# COMMAND ----------
+
+
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ### Exercise: Oceania's Emissions
+# MAGIC How do Australia and New Zealand compare against each other in terms of Emissions/Temperature over the years? Use `oceania_emissions_df` to find out.
+
+# COMMAND ----------
+
+
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ### Exercise: Hardest hit countries?
+# MAGIC Which countries have the worst temperature anamolies as a result of Emissions? Can our existing data actually answer that question? What might you change about your data processing to take that into consideration?
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## Questions to consider
+# MAGIC * Was the data able to answer some of our questions appropriately?
+# MAGIC * Is this enough data to do proper statistical analyses?
+# MAGIC * What kinds of additional questions might you ask about this data?
+# MAGIC * Can the data that we have here answer those additional questions?
+# MAGIC * How might you change your approach (e.g. pre-aggregation) to pre-shaping data? 
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## For those who are interested in ML... (optional)
+
+# COMMAND ----------
+
+## If you would like to experiment with Machine Learning or Predictions
+import sklearn
