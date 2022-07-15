@@ -676,7 +676,7 @@ def test_remove_lenny_face():
       assert spark_df.filter(F.col("lmao").isNull()).count() == 3
       assert spark_df.filter(F.col("lmao").isNotNull()).count() == 2
   except Exception as e:
-      raise type(e)(''.join(debug(original))) from e
+      raise type(e)(''.join(original)) from e
   print("All tests passed :)")
   
 test_remove_lenny_face()

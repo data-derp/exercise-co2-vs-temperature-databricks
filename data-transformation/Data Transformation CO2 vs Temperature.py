@@ -587,18 +587,18 @@ def remove_lenny_face(temperature: str) -> str:
 # COMMAND ----------
 
 def test_remove_lenny_face():
-  original = pd.Series(["( ͡° ͜ʖ ͡°)4.384( ͡° ͜ʖ ͡°)", "-", "?", "#", "( ͡° ͜ʖ ͡°)1.53( ͡° ͜ʖ ͡°)"])
-  try:
-      result = original.map(remove_lenny_face)
-      assert result.to_list() == ["4.384", "-", "?", "#", "1.53"] # make valid floats parsable
-      spark_df = spark.createDataFrame(pd.DataFrame({"lol": result}))
-      spark_df = spark_df.withColumn("lmao", F.col("lol").cast(FloatType())) # automatic casting with spark
-      assert spark_df.filter(F.col("lmao").isNull()).count() == 3
-      assert spark_df.filter(F.col("lmao").isNotNull()).count() == 2
-  except Exception as e:
-      raise type(e)(''.join(debug(original))) from e
-  print("All tests passed :)")
-  
+    original = pd.Series(["( ͡° ͜ʖ ͡°)4.384( ͡° ͜ʖ ͡°)", "-", "?", "#", "( ͡° ͜ʖ ͡°)1.53( ͡° ͜ʖ ͡°)"])
+    try:
+        result = original.map(remove_lenny_face)
+        assert result.to_list() == ["4.384", "-", "?", "#", "1.53"] # make valid floats parsable
+        spark_df = spark.createDataFrame(pd.DataFrame({"lol": result}))
+        spark_df = spark_df.withColumn("lmao", F.col("lol").cast(FloatType())) # automatic casting with spark
+        assert spark_df.filter(F.col("lmao").isNull()).count() == 3
+        assert spark_df.filter(F.col("lmao").isNotNull()).count() == 2
+    except Exception as e:
+        raise type(e)(''.join(original)) from e
+    print("All tests passed :)")
+
 test_remove_lenny_face()
 
 # COMMAND ----------
