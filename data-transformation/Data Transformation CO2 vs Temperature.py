@@ -632,6 +632,8 @@ def test_fix_country():
   except Exception as e:
     raise type(e)(''.join(debug(original))) from e
   print("All tests pass! :)")
+  
+test_fix_country()
 
 test_fix_country()
 
